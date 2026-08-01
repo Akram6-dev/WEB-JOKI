@@ -96,15 +96,41 @@ document.getElementById("orderForm").addEventListener("submit", function (e) {
 
   const waURL = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
 
-  const link = document.createElement("a");
-  link.href = waURL;
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  // Salin detail pesanan ke clipboard
+  let copySuccess = false;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(message);
+    }
+    
+    // Fallback copy secara synchronous menggunakan temporary textarea
+    const textArea = document.createElement("textarea");
+    textArea.value = message;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    copySuccess = true;
+  } catch (err) {
+    console.error("Gagal menyalin teks ke clipboard:", err);
+  }
 
-  showToast("✅ Pesanan berhasil dikirim! WhatsApp sedang dibuka...", "success");
+  // Tampilkan notifikasi toast
+  if (copySuccess) {
+    showToast("✅ Detail pesanan disalin ke clipboard & WhatsApp sedang dibuka...", "success");
+  } else {
+    showToast("✅ Membuka WhatsApp...", "success");
+  }
+
+  // Buka URL WhatsApp
+  const newWindow = window.open(waURL, "_blank");
+  if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
+    // Jika window.open diblokir popup blocker, gunakan redirect pada tab saat ini
+    window.location.href = waURL;
+  }
+
   this.reset();
   fileName.textContent = "Klik atau drag file ke sini";
 });
