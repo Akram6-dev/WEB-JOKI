@@ -56,7 +56,7 @@ document.getElementById("orderForm").addEventListener("submit", function (e) {
 
   const nama = document.getElementById("nama").value.trim();
   const wa = document.getElementById("wa").value.trim();
-  const layanan = document.getElementById("layanan").value.trim();
+  const layanan = document.getElementById("selectLayanan").value.trim();
   const judul = document.getElementById("judul").value.trim();
   const deadline = document.getElementById("deadline").value;
   const deskripsi = document.getElementById("deskripsi").value.trim();
