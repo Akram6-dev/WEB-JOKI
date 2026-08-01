@@ -53,7 +53,7 @@ fileInput.addEventListener("change", () => {
 });
 
 // ===== FORM VALIDATION & WHATSAPP =====
-document.getElementById("orderForm").addEventListener("submit", function (e) {
+document.getElementById("orderForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const nama = document.getElementById("nama").value.trim();
@@ -62,6 +62,7 @@ document.getElementById("orderForm").addEventListener("submit", function (e) {
   const judul = document.getElementById("judul").value.trim();
   const deadline = document.getElementById("deadline").value;
   const deskripsi = document.getElementById("deskripsi").value.trim();
+  const file = fileInput.files[0];
 
   // Validasi
   const fields = [
@@ -85,14 +86,69 @@ document.getElementById("orderForm").addEventListener("submit", function (e) {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
   });
 
+  const submitBtn = this.querySelector(".btn-submit");
+  const originalBtnText = submitBtn.innerHTML;
+
+  let fileLink = "";
+  let uploadFailed = false;
+
+  if (file) {
+    // Batas ukuran file (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      showToast("⚠️ Ukuran file maksimal 10MB!", "error");
+      return;
+    }
+
+    // Disable button & loading feedback
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Mengunggah File...`;
+    showToast("⏳ Sedang mengunggah file lampiran ke cloud...", "info");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("https://tmpfiles.org/api/v1/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!response.ok) throw new Error("Upload failed");
+
+      const json = await response.json();
+      if (json.status === "success" && json.data && json.data.url) {
+        // Direct download link format
+        fileLink = json.data.url.replace("https://tmpfiles.org/", "https://tmpfiles.org/dl/");
+      } else {
+        throw new Error("Invalid response");
+      }
+    } catch (err) {
+      console.error("Gagal upload file:", err);
+      uploadFailed = true;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+    }
+  }
+
   // Format pesan WhatsApp
+  let fileText = "";
+  if (file) {
+    if (fileLink) {
+      fileText = `Link File: ${fileLink}\n`;
+    } else {
+      fileText = `File Lampiran: ${file.name} (Gagal diunggah, silakan kirim manual)\n`;
+    }
+  }
+
   const message =
     `Halo, saya ingin memesan jasa.\n\n` +
     `Nama: ${nama}\n` +
     `Nomor WA: ${wa}\n` +
     `Layanan: ${layanan}\n` +
     `Judul Tugas: ${judul}\n` +
-    `Deadline: ${deadlineFormatted}\n\n` +
+    `Deadline: ${deadlineFormatted}\n` +
+    fileText + `\n` +
     `Deskripsi:\n${deskripsi}\n\n` +
     `Mohon informasi harga dan estimasi pengerjaan.`;
 
@@ -120,8 +176,10 @@ document.getElementById("orderForm").addEventListener("submit", function (e) {
   }
 
   // Tampilkan notifikasi toast
-  if (copySuccess) {
-    showToast("✅ Detail pesanan disalin ke clipboard & WhatsApp sedang dibuka...", "success");
+  if (uploadFailed) {
+    showToast("⚠️ File gagal diunggah, silakan kirim file secara manual di WhatsApp.", "error");
+  } else if (copySuccess) {
+    showToast("✅ Detail pesanan disalin & WhatsApp sedang dibuka...", "success");
   } else {
     showToast("✅ Membuka WhatsApp...", "success");
   }

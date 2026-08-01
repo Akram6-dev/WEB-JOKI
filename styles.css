@@ -432,6 +432,7 @@ body {
 }
 .toast-success { background: #10b981; }
 .toast-error { background: #ef4444; }
+.toast-info { background: #3b82f6; }
 .toast.fade-out { opacity: 0; transform: translateY(10px) scale(0.95); }
 
 @keyframes toastSlideIn {
