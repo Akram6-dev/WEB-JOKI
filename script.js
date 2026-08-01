@@ -12,8 +12,9 @@ const hamburger = document.getElementById("hamburger");
 const navLinks = document.getElementById("navLinks");
 
 hamburger.addEventListener("click", () => {
-  navLinks.classList.toggle("open");
-  hamburger.querySelector("i").className = navLinks.classList.contains("open")
+  const isOpen = navLinks.classList.toggle("open");
+  document.body.style.overflow = isOpen ? "hidden" : "";
+  hamburger.querySelector("i").className = isOpen
     ? "fas fa-times"
     : "fas fa-bars";
 });
@@ -21,6 +22,7 @@ hamburger.addEventListener("click", () => {
 navLinks.querySelectorAll("a").forEach(link => {
   link.addEventListener("click", () => {
     navLinks.classList.remove("open");
+    document.body.style.overflow = "";
     hamburger.querySelector("i").className = "fas fa-bars";
   });
 });
@@ -141,22 +143,14 @@ function showToast(msg, type = "success") {
   if (existing) existing.remove();
 
   const toast = document.createElement("div");
-  toast.className = "toast";
+  toast.className = `toast toast-${type}`;
   toast.textContent = msg;
-  toast.style.cssText = `
-    position: fixed; bottom: 100px; right: 28px; z-index: 9999;
-    background: ${type === "success" ? "#10b981" : "#ef4444"};
-    color: #fff; padding: 14px 22px; border-radius: 10px;
-    font-weight: 600; font-size: .92rem; box-shadow: 0 4px 20px rgba(0,0,0,.2);
-    animation: slideIn .3s ease; max-width: 320px; line-height: 1.4;
-  `;
-
-  const style = document.createElement("style");
-  style.textContent = `@keyframes slideIn { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }`;
-  document.head.appendChild(style);
 
   document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
+  setTimeout(() => {
+    toast.classList.add("fade-out");
+    setTimeout(() => toast.remove(), 300);
+  }, 3700);
 }
 
 // ===== SET MIN DATE FOR DEADLINE =====
