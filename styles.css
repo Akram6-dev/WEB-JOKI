@@ -457,17 +457,18 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding: 32px 24px;
+    height: calc(100vh - 68px);
+    background: rgba(15, 23, 42, 0.97);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.2);
+    padding: 32px 24px 48px;
     gap: 16px;
-    border-top: 1px solid var(--gray-100);
     transform: translateY(-100%);
     opacity: 0;
     pointer-events: none;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
     z-index: 999;
+    overflow-y: auto;
   }
   
   .nav-links.open {
@@ -501,21 +502,21 @@ body {
     padding: 14px 20px;
     border-radius: var(--radius);
     text-align: center;
-    background: var(--gray-50);
-    border: 1.5px solid var(--gray-100);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
     transition: var(--transition);
-    color: var(--gray-900);
+    color: var(--white);
   }
   
   .nav-links a:active {
-    background: var(--gray-100);
+    background: rgba(255, 255, 255, 0.14);
     transform: scale(0.98);
   }
   
   .btn-nav {
-    background: var(--primary-light) !important;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent)) !important;
     color: var(--white) !important;
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
     border: none !important;
   }
 
